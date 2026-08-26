@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-registry-backend
+  labels:
+    app: bank-registry-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank-registry-backend
+  template:
+    metadata:
+      labels:
+        app: bank-registry-backend
+    spec:
+      containers:
+      - name: backend
+        image: bank-registry-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - secretRef:
+            name: backend-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: bank-registry-backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
